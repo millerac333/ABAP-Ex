@@ -1,25 +1,15 @@
-REPORT Z_ABPTRAIN_EXER18.
-************************************************************************
-*Report Name: Z_ABPTRAIN_EXER18
-*Report Title: Data_Calculations
-*User:
-*Date:
-************************************************************************
-DATA: lv_number1 TYPE p LENGTH 14,
-      lv_number2 TYPE p LENGTH 14,
-      lv_date1 TYPE sy-datum,
-      lv_date2 TYPE sy-datum,
-      lv_sum TYPE p,
-      lv_date_diff TYPE p,
-      lv_number_diff TYPE p,
-      lv_result TYPE p,
-      lv_quot TYPE p DECIMALS 14 LENGTH 14,
-      lv_mod TYPE p.
+REPORT Z_ABPTRAIN_ACM_EXER18.
 
-lv_number1 = 333.
-lv_number2 = 25.
-lv_date1 = sy-datum.
-lv_date2 = sy-datum.
+DATA: lv_number1(3)  TYPE p VALUE 333,
+      lv_number2(2)  TYPE p VALUE 25,
+      lv_sum         TYPE p,
+      lv_number_diff TYPE p,
+      lv_result      TYPE p,
+      lv_quot        TYPE p DECIMALS 14 LENGTH 14,
+      lv_mod         TYPE p.
+
+DATA(lv_date1) = sy-datum.
+DATA(lv_date2) = sy-datum.
 
 *Set date 2 to first day of current month
 lv_date2+6(2) = '01'.
@@ -28,7 +18,7 @@ lv_date2+6(2) = '01'.
 lv_date2 = lv_date2 - 1.
 
 *Calculate difference in days
-lv_date_diff = lv_date1 - lv_date2.
+DATA(lv_date_diff) = lv_date1 - lv_date2.
 
 *Calculate sum of two numbers
 lv_sum = lv_number1 + lv_number2.
