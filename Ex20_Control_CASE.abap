@@ -1,40 +1,33 @@
-REPORT z_abptrain_exer20.
-************************************************************************
-*Report Name: Z_ABPTRAIN_EXER20
-*Report Title:
-*User:
-*Date:
-************************************************************************
+REPORT z_abptrain_acm_exer20.
+
 *Declare Data Types
-DATA: lv_number1 TYPE p LENGTH 14,
-      lv_number2 TYPE p LENGTH 14,
-      lv_date1 TYPE sy-datum,
-      lv_date2 TYPE sy-datum,
-      lv_sum TYPE p,
-      lv_date_diff TYPE p,
+DATA: lv_number1     TYPE p LENGTH 14,
+      lv_number2     TYPE p LENGTH 14,
+      lv_sum         TYPE p,
       lv_number_diff TYPE p,
-      lv_result TYPE p,
-      lv_quot TYPE p DECIMALS 14 LENGTH 14,
-      lv_mod TYPE p,
-      lv_taco TYPE c.
+      lv_result      TYPE p,
+      lv_quot        TYPE p DECIMALS 14 LENGTH 14,
+      lv_mod         TYPE p,
+      lv_taco        TYPE c.
+
+DATA(lv_date1) = sy-datum.
+DATA(lv_date2) = sy-datum.
 
 *Build Screen for Input
 SELECTION-SCREEN BEGIN OF BLOCK rad1
   WITH FRAME TITLE text-002.
-PARAMETERS: p_num1 TYPE i,
-            p_num2 TYPE i,
-            rb_sum RADIOBUTTON GROUP g1,
+PARAMETERS: p_num1   TYPE i,
+            p_num2   TYPE i,
+            rb_sum   RADIOBUTTON GROUP g1,
             rb_ndiff RADIOBUTTON GROUP g1,
-            rb_res RADIOBUTTON GROUP g1,
-            rb_quot RADIOBUTTON GROUP g1,
-            rb_mod RADIOBUTTON GROUP g1.
+            rb_res   RADIOBUTTON GROUP g1,
+            rb_quot  RADIOBUTTON GROUP g1,
+            rb_mod   RADIOBUTTON GROUP g1.
 SELECTION-SCREEN END OF BLOCK rad1.
 
 *Set Values
 lv_number1 = p_num1.
 lv_number2 = p_num2.
-lv_date1 = sy-datum.
-lv_date2 = sy-datum.
 
 *REPORTS (FUNCTIONS)
 *Set date 2 to first day of current month
@@ -44,7 +37,7 @@ lv_date2+6(2) = '01'.
 lv_date2 = lv_date2 - 1.
 
 *Calculate difference in days
-lv_date_diff = lv_date1 - lv_date2.
+DATA(lv_date_diff) = lv_date1 - lv_date2.
 
 *Calculate sum of two numbers
 lv_sum = lv_number1 + lv_number2.
@@ -62,18 +55,18 @@ lv_quot = lv_number1 / lv_number2.
 lv_mod = lv_number1 MOD lv_number2.
 
 "CONDITIONALS
-IF rb_sum IS NOT INITIAL.
-  lv_taco = '+'.
+IF rb_sum       IS NOT INITIAL.
+  lv_taco = |+|.
 ELSEIF rb_ndiff IS NOT INITIAL.
-  lv_taco = '-'.
-ELSEIF rb_res IS NOT INITIAL.
-  lv_taco = '*'.
-ELSEIF rb_quot IS NOT INITIAL.
-  lv_taco = '/'.
-ELSEIF rb_mod IS NOT INITIAL.
-  lv_taco = '%'.
+  lv_taco = |-|.
+ELSEIF rb_res   IS NOT INITIAL.
+  lv_taco = |*|.
+ELSEIF rb_quot  IS NOT INITIAL.
+  lv_taco = |/|.
+ELSEIF rb_mod   IS NOT INITIAL.
+  lv_taco = |%|.
 ELSE.
-  WRITE: 'Please select an option'.
+  WRITE: |Please select an option|.
 ENDIF.
 
 "CASE STATMENTS
@@ -89,5 +82,5 @@ CASE lv_taco.
   WHEN '%'.
     WRITE: 'Modulus ', lv_mod.
   WHEN OTHERS.
-    WRITE:'Please select an option'.
+    WRITE:|Please select an option|.
 ENDCASE.
