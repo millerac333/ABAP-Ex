@@ -1,5 +1,5 @@
 REPORT z_abptrain_acm_exer48.
-************************************************************************
+**************************************************************************************
 *Report Name: Z_ABPTRAIN_ACM_EXER48
 *Report Title: Calculator OOP and MVC
 *User: Aaron Miller
@@ -8,7 +8,7 @@ REPORT z_abptrain_acm_exer48.
 *Illustrates MVC (Model, View, Controller) pattern with use of classes
 *User types 2 numbers and chooses 1 of 4 operating options to calculate
 *Result of calculation is then displayed
-************************************************************************
+**************************************************************************************
 
 *Data declaration for flag
 DATA: gv_flag TYPE c.
@@ -49,6 +49,7 @@ AT SELECTION-SCREEN.
     MESSAGE: e000(zex43msgid).
   ENDIF.
 
+**************************************************************************************
 *create class for "model" to hold business logic of program; acts like a template
 CLASS lcl_calc_model DEFINITION.
 
@@ -82,7 +83,9 @@ CLASS lcl_calc_model IMPLEMENTATION.
   ENDMETHOD.
 
 ENDCLASS.
+**************************************************************************************
 
+**************************************************************************************
 *Controller class to serve as link between VIEW and MODEL class
 *This will use template from model class to complete user specified calculation
 CLASS lcl_calc_controller DEFINITION.
@@ -139,7 +142,9 @@ CLASS lcl_calc_controller IMPLEMENTATION.
   ENDMETHOD.
 
 ENDCLASS.
+**************************************************************************************
 
+**************************************************************************************
 *Creation of "View" class to show result of program's calculation to user
 CLASS lcl_calc_view DEFINITION.
 
@@ -164,8 +169,10 @@ CLASS lcl_calc_view IMPLEMENTATION.
     me->get_controller = set_controller.
   ENDMETHOD.
 
-*this method ties the class data & methods from "model" class to data & methods of "controller" class
-*then, based on the user calculation choice (rb), computer will perform proper "write statement"
+*this method ties the class data & methods 
+*from "model" class to data & methods of "controller" class
+*then, based on the user calculation choice (rb),
+*computer will perform proper "write statement"
   METHOD display_result.
     IF me->get_controller->set_operator = '+'.
       WRITE: me->get_controller->set_sum.
@@ -182,8 +189,10 @@ CLASS lcl_calc_view IMPLEMENTATION.
   ENDMETHOD.
 
 ENDCLASS.
+**************************************************************************************
 
-*Declare data types for CREATE OBJECT which ties "Model" class, "View" class, & "Controller" class together
+*Declare data types for CREATE OBJECT 
+*which ties "Model" class, "View" class, & "Controller" class together
 *takes user input and then manipulates input based on MVC classes above.
 DATA: lo_calc_model      TYPE REF TO lcl_calc_model,
       lo_calc_controller TYPE REF TO lcl_calc_controller,
