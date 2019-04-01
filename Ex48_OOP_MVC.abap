@@ -1,211 +1,217 @@
-REPORT Z_ABPTRAIN003_EXER48.
+REPORT z_abptrain_acm_exer48.
+************************************************************************
+*Report Name: Z_ABPTRAIN_ACM_EXER48
+*Report Title: Calculator OOP and MVC
+*User: Aaron Miller
+*Date: 4/01/2019
 
-DATA: gv_flag_operator TYPE c.
+*Illustrates MVC (Model, View, Controller) pattern with use of classes
+*User types 2 numbers and chooses 1 of 4 operating options to calculate
+*Result of calculation is then displayed
+************************************************************************
 
-PARAMETERS: p_int1 TYPE i,
-            p_int2 TYPE i.
+*Data declaration for flag
+DATA: gv_flag TYPE c.
 
-**radio button selection for the user to choose which operation
-**they would like completed
-SELECTION-SCREEN BEGIN OF BLOCK calculations
-                  WITH FRAME TITLE text-001.
+*SELECTION SCREEN for user interface will serve as VIEW for MVC.
+SELECTION-SCREEN
+  BEGIN OF BLOCK b1
+    WITH FRAME TITLE text-001.
+*Parameters used for user input to select numbers for program
+PARAMETERS: p_num1 TYPE i,
+            p_num2 TYPE i.
+SELECTION-SCREEN END OF BLOCK b1.
 
-PARAMETERS: rb_sum  RADIOBUTTON GROUP calc,
-            rb_dif  RADIOBUTTON GROUP calc,
-            rb_prod RADIOBUTTON GROUP calc,
-            rb_div  RADIOBUTTON GROUP calc.
-
-SELECTION-SCREEN END OF BLOCK calculations.
-
+SELECTION-SCREEN
+  BEGIN OF BLOCK b2
+    WITH FRAME TITLE text-002.
+*Parameters for rb selection which will allow user to choose which operation
+PARAMETERS: rb_sum  RADIOBUTTON GROUP rbg1,
+            rb_diff RADIOBUTTON GROUP rbg1,
+            rb_prod RADIOBUTTON GROUP rbg1,
+            rb_quot RADIOBUTTON GROUP rbg1.
+SELECTION-SCREEN END OF BLOCK b2.
 
 AT SELECTION-SCREEN.
-
-*this if statment checks which operation the user chose
-IF rb_sum IS NOT INITIAL.
-  gv_flag_operator = '+'.
-
-ELSEIF rb_dif IS NOT INITIAL.
-  gv_flag_operator = '-'.
-
-ELSEIF rb_prod IS NOT INITIAL.
-  gv_flag_operator = '*'.
-
-ELSE.
-  gv_flag_operator = '/'.
-
-ENDIF.
-
-* Lets the user know that they cannot divide by zero
-  IF p_int2 = 0 AND gv_flag_operator = '/'.
-
-    MESSAGE: e003(Z_abptrain003_mess).
-
+*Validation of operation selection by user
+  IF rb_sum IS NOT INITIAL.
+    gv_flag = '+'.
+  ELSEIF rb_diff IS NOT INITIAL.
+    gv_flag = '-'.
+  ELSEIF rb_prod IS NOT INITIAL.
+    gv_flag = '*'.
+  ELSE.
+    gv_flag = '/'.
   ENDIF.
 
-*local model class that obtains input from the user
-CLASS lcl_model DEFINITION.
+*This IF validates that 2nd number is NOT zero and triggers error msg if it is
+  IF p_num2 = 0 AND gv_flag = '/'.
+    MESSAGE: e000(zex43msgid).
+  ENDIF.
+
+*create class for "model" to hold business logic of program; acts like a template
+CLASS lcl_calc_model DEFINITION.
+
+* Public section will allow attributes to be accessed OUTSIDE of class
   PUBLIC SECTION.
-    DATA: s_int1           TYPE i,
-          s_int2           TYPE i,
-          s_flag_operator  TYPE c.
+*Declaration of data for "model" class based off of "view" data and parameters
+    DATA: set_num1 TYPE i,
+          set_num2 TYPE i,
+          set_flag TYPE c.
+*Declaration of data for data "model" behavior
+    METHODS: get_nums      IMPORTING get_num1 TYPE i
+                                     get_num2 TYPE i,
+      get_operation IMPORTING get_flag TYPE c.
 
-    METHODS: getints      IMPORTING lp_int1 TYPE i lp_int2 TYPE i,
-             getoperation IMPORTING lp_flag_operator TYPE c.
-ENDCLASS.                    "lcl_model DEFINITION
+ENDCLASS.
 
-*local model class implementaion
-CLASS lcl_model IMPLEMENTATION.
-  METHOD getints.
+*implement "model" class (after defining it)
+CLASS lcl_calc_model IMPLEMENTATION.
 
-    me->s_int1 = lp_int1.
-    me->s_int2 = lp_int2.
-
-  ENDMETHOD.                    "getints
-
-  METHOD getoperation.
-
-    me->s_flag_operator = lp_flag_operator.
-
-  ENDMETHOD.                    "getoperation
-ENDCLASS.                    "lcl_model IMPLEMENTATION
-
-
-*local controller class obtains input from the model class
-*to complete the calculations of the user choice
-CLASS lcl_controller DEFINITION.
-  PUBLIC SECTION.
-
-    DATA: s_sum  TYPE i,
-          s_diff TYPE i,
-          s_prod TYPE i,
-          s_div  TYPE i,
-          s_operator TYPE c,
-          s_model TYPE REF TO lcl_model.
-
-    METHODS: constructor IMPORTING smodel TYPE REF TO lcl_model,
-             doaddition,
-             dosubtraction,
-             dodivision,
-             domultiplication.
-ENDCLASS.                    "lcl_controller DEFINITION
-
-
-*local controller class implementaion
-CLASS lcl_controller IMPLEMENTATION.
-*this method gains access to the model class
-  METHOD constructor.
-
-    me->s_model = smodel.
-
-  ENDMETHOD.                    "constructor
-
-*  this methods adds the two integers obtained from the
-*  model class
-  METHOD doaddition.
-
-    s_sum = me->s_model->s_int1 + me->s_model->s_int2.
-    s_operator = me->s_model->s_flag_operator.
-
-  ENDMETHOD.                    "doaddition
-
-*  this methods subtracts the two integers obtained from the
-*  model class
-  METHOD dosubtraction.
-
-    s_diff = me->s_model->s_int1 - me->s_model->s_int2.
-    s_operator = me->s_model->s_flag_operator.
-
-  ENDMETHOD.                    "dosubtraction
-
-*  this methods divides the two integers obtained from the
-*  model class
-  METHOD dodivision.
-
-    s_div = me->s_model->s_int1 / me->s_model->s_int2.
-    s_operator = me->s_model->s_flag_operator.
-
-  ENDMETHOD.                    "dodivision
-
-*  this methods multiplies the two integers obtained from the
-*  model class
-  METHOD domultiplication.
-
-    s_prod = me->s_model->s_int1 * me->s_model->s_int2.
-    s_operator = me->s_model->s_flag_operator.
-
-  ENDMETHOD.                    "domultiplication
-ENDCLASS.                    "lcl_controller IMPLEMENTATION
-
-*local view class that displays the output to the user
-CLASS lcl_view DEFINITION.
-  PUBLIC SECTION.
-
-  DATA: s_controller TYPE REF TO lcl_controller.
-
-  METHODS:  writeresult,
-            constructor IMPORTING scontroller TYPE REF TO lcl_controller.
-
-ENDCLASS.                    "lcl_view DEFINITION
-
-
-*local view class implementation
-CLASS lcl_view IMPLEMENTATION.
-*
-  METHOD constructor.
-
-   me->s_controller = scontroller.
-
+*"me->" = "This()" METHOD for redefining value of data from model
+*and equating it to user input parameters
+  METHOD get_nums.
+    me->set_num1 = get_num1.
+    me->set_num2 = get_num2.
   ENDMETHOD.
-*
-*
-  METHOD writeresult.
 
-    if me->s_controller->s_operator = '+'.
-      WRITE: me->s_controller->s_sum.
+*METHOD for redifining flag value from model class
+*and equating it to radio button parameter
+  METHOD get_operation.
+    me->set_flag = get_flag.
+  ENDMETHOD.
 
-    ELSEIF me->s_controller->s_operator = '-'.
-      WRITE: me->s_controller->s_diff.
+ENDCLASS.
 
-    ELSEIF me->s_controller->s_operator = '/'.
-      WRITE: me->s_controller->s_div.
+*Controller class to serve as link between VIEW and MODEL class
+*This will use template from model class to complete user specified calculation
+CLASS lcl_calc_controller DEFINITION.
+
+* Public section will allow attributes to be accessed OUTSIDE of class
+  PUBLIC SECTION.
+
+* Declaration of data types for controller class
+    DATA: set_sum        TYPE i,
+          set_diff       TYPE i,
+          set_prod       TYPE i,
+          set_quot       TYPE i,
+          set_operator   TYPE c,
+          get_calc_model TYPE REF TO lcl_calc_model.
+
+* Declaration of methods for controller class
+    METHODS: constructor IMPORTING set_model TYPE REF TO lcl_calc_model,
+      get_sum,
+      get_diff,
+      get_prod,
+      get_quot.
+ENDCLASS.
+
+*implement "controller" class after defining it
+CLASS lcl_calc_controller IMPLEMENTATION.
+
+*constructor will give access to local "model" class
+  METHOD constructor.
+    me->get_calc_model = set_model.
+  ENDMETHOD.
+
+*method to ADD two integers from "model" class
+  METHOD get_sum.
+    set_sum = me->get_calc_model->set_num1 + me->get_calc_model->set_num2.
+    set_operator = me->get_calc_model->set_flag.
+  ENDMETHOD.
+
+*method to SUBTRACT two integers from "model" class
+  METHOD get_diff.
+    set_diff = me->get_calc_model->set_num1 - me->get_calc_model->set_num2.
+    set_operator = me->get_calc_model->set_flag.
+  ENDMETHOD.
+
+*method to MULTIPLY two integers from model class
+  METHOD get_prod.
+    set_prod = me->get_calc_model->set_num1 * me->get_calc_model->set_num2.
+    set_operator = me->get_calc_model->set_flag.
+  ENDMETHOD.
+
+*method to DIVIDE two integers from model class
+  METHOD get_quot.
+    set_quot = me->get_calc_model->set_num1 / me->get_calc_model->set_num2.
+    set_operator = me->get_calc_model->set_flag.
+  ENDMETHOD.
+
+ENDCLASS.
+
+*Creation of "View" class to show result of program's calculation to user
+CLASS lcl_calc_view DEFINITION.
+
+* Public section will allow attributes to be accessed OUTSIDE of class
+  PUBLIC SECTION.
+
+*Data type declaration for "view" class referencing data type from "controller" class
+    DATA: get_controller TYPE REF TO lcl_calc_controller.
+
+*Declaration of "View" class methods;
+*one is new and other is referencing method from "controller" class
+    METHODS: display_result,
+      constructor IMPORTING set_controller TYPE REF TO lcl_calc_controller.
+
+ENDCLASS.
+
+*implement "view" class after defining it
+CLASS lcl_calc_view IMPLEMENTATION.
+
+*constructor method for class utilizing data from "controller" class
+  METHOD constructor.
+    me->get_controller = set_controller.
+  ENDMETHOD.
+
+*this method ties the class data & methods from "model" class to data & methods of "controller" class
+*then, based on the user calculation choice (rb), computer will perform proper "write statement"
+  METHOD display_result.
+    IF me->get_controller->set_operator = '+'.
+      WRITE: me->get_controller->set_sum.
+
+    ELSEIF me->get_controller->set_operator = '-'.
+      WRITE: me->get_controller->set_diff.
+
+    ELSEIF me->get_controller->set_operator = '*'.
+      WRITE: me->get_controller->set_prod.
 
     ELSE.
-      WRITE: me->s_controller->s_prod.
+      WRITE: me->get_controller->set_quot.
     ENDIF.
-
-
   ENDMETHOD.
 
-ENDCLASS.                    "lcl_view IMPLEMENTATION
+ENDCLASS.
 
+*Declare data types for CREATE OBJECT which ties "Model" class, "View" class, & "Controller" class together
+*takes user input and then manipulates input based on MVC classes above.
+DATA: lo_calc_model      TYPE REF TO lcl_calc_model,
+      lo_calc_controller TYPE REF TO lcl_calc_controller,
+      lo_calc_view       TYPE REF TO lcl_calc_view.
 
-DATA: lo_model      TYPE REF TO lcl_model,
-      lo_controller TYPE REF TO lcl_controller,
-      lo_view       TYPE REF TO lcl_view.
-
-*gets the input from the user and manipulates the input
 START-OF-SELECTION.
+  CREATE OBJECT: lo_calc_model,
+                 lo_calc_controller EXPORTING set_model = lo_calc_model,
+                 lo_calc_view       EXPORTING set_controller = lo_calc_controller.
 
-  CREATE OBJECT: lo_model,
-                 lo_controller EXPORTING smodel = lo_model,
-                 lo_view EXPORTING scontroller = lo_controller.
+  lo_calc_model->get_nums(      EXPORTING get_num1 = p_num1
+                                          get_num2 = p_num2 ).
+  lo_calc_model->get_operation( EXPORTING get_flag = gv_flag ).
 
-  lo_model->getints( EXPORTING lp_int1 = p_int1 lp_int2 = p_int2 ).
-  lo_model->getoperation( EXPORTING lp_flag_operator = gv_flag_operator ).
+*Logic that calls and runs the 3 MVC classes
+  IF gv_flag = '+'.
+    lo_calc_controller->get_sum( ).
+    lo_calc_view->display_result( ).
 
-  IF gv_flag_operator = '+'.
-    lo_controller->doaddition( ).
-    lo_view->writeresult( ).
+  ELSEIF gv_flag = '-'.
+    lo_calc_controller->get_diff( ).
+    lo_calc_view->display_result( ).
 
-  ELSEIF gv_flag_operator = '-'.
-    lo_controller->dosubtraction( ).
-    lo_view->writeresult( ).
-
-  ELSEIF gv_flag_operator = '/'.
-    lo_controller->dodivision( ).
-    lo_view->writeresult( ).
+  ELSEIF gv_flag = '*'.
+    lo_calc_controller->get_prod( ).
+    lo_calc_view->display_result( ).
 
   ELSE.
-    lo_controller->domultiplication( ).
-    lo_view->writeresult( ).
+    lo_calc_controller->get_quot( ).
+    lo_calc_view->display_result( ).
   ENDIF.
