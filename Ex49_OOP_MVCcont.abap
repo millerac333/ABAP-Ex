@@ -38,7 +38,7 @@ SELECTION-SCREEN END OF BLOCK b2.
 
 AT SELECTION-SCREEN.
 *Validation of operation selection by user
-  IF rb_sum IS NOT INITIAL.
+  IF rb_sum      IS NOT INITIAL.
     gv_flag = '+'.
   ELSEIF rb_diff IS NOT INITIAL.
     gv_flag = '-'.
@@ -57,7 +57,6 @@ CLASS lcl_calc_model DEFINITION.
 *Declaration of data for "model" class based off of "view" data and parameters
     DATA: set_num1 TYPE i,
           set_num2 TYPE i,
-          default_num TYPE i VALUE 1,
           set_flag TYPE c.
 *Declaration of data for data "model" behavior
     METHODS: constructor   IMPORTING get_num1 TYPE i
