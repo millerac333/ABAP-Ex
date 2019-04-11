@@ -22,13 +22,11 @@ REPORT z_abptrain_acm_exer51.
 
 INITIALIZATION.
 *Data declaration for flag and result of calcualtion
-  DATA: lv_flag       TYPE c,
-        lv_ans        TYPE i,
+  DATA: lv_ans        TYPE i,
         lv_user_event TYPE  sy-ucomm.
 
 *clear values of this data
-  CLEAR: lv_flag,
-         lv_ans,
+  CLEAR: lv_ans,
          lv_user_event.
 
 *creation of box for user input of two numbers
@@ -514,7 +512,7 @@ CLASS lcl_control_modulo IMPLEMENTATION.
 *Method Logic (behavior)
   METHOD m_execute_modulo.
     me->set_modulo->m_calculate( EXPORTING set_num1 = mod_num1
-                                             set_num2 = mod_num2
+                                           set_num2 = mod_num2
                                  CHANGING  set_ans = set_ans ).
   ENDMETHOD.
 
@@ -537,7 +535,6 @@ START-OF-SELECTION.
                                    CHANGING  set_ans = lv_ans ).
 *user selection of subtraction operation
   ELSEIF cb_diff IS NOT INITIAL.
-*    lv_flag = '-'.
 *object creation referencing PARENT calcualte class, CHILD subtraction class, and subtraction controller
     DATA(lo_subtraction) =      NEW lcl_subtraction( ).
     DATA(lo_control_subtract) = NEW lcl_control_subtract( set_subtract = lo_subtraction ).
@@ -547,7 +544,6 @@ START-OF-SELECTION.
                                              CHANGING  set_ans = lv_ans ).
 *user selection of multiplication operation
   ELSEIF cb_prod IS NOT INITIAL.
-*    lv_flag = '*'.
 *object creation referencing PARENT calcualte class, CHILD multiplication class, and multiplication controller
     DATA(lo_multiplication) =   NEW lcl_multiplication( ).
     DATA(lo_control_multiply) = NEW lcl_control_multiply( set_multiply = lo_multiplication ).
@@ -557,7 +553,6 @@ START-OF-SELECTION.
                                              CHANGING  set_ans = lv_ans ).
 *user selection of division operation
   ELSEIF cb_quot IS NOT INITIAL.
-*    lv_flag = '/'.
 *object creation referencing PARENT calcualte class, CHILD division class, and division controller
     DATA(lo_division) =       NEW lcl_division( ).
     DATA(lo_control_divide) = NEW lcl_control_divide( set_divide = lo_division ).
@@ -567,7 +562,6 @@ START-OF-SELECTION.
                                          CHANGING  set_ans = lv_ans ).
 *user selection of modulo operation
   ELSEIF cb_mod IS NOT INITIAL.
-*    lv_flag = '%'.
 *object creation referencing PARENT calcualte class, CHILD division class, and division controller
     DATA(lo_modulo) =         NEW lcl_modulo( ).
     DATA(lo_control_modulo) = NEW lcl_control_modulo( set_remainder = lo_modulo ).
